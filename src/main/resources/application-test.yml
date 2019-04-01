@@ -1,6 +1,6 @@
 spring:
   datasource:
     username: root
-    password: root
+    password: yy417168602,./
     url: jdbc:mysql://localhost:3306/fasterp?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
