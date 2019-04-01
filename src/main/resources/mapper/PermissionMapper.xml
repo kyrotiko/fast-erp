@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yy.fasterp.mapper.PermissionMapper">
+    <sql id="Base_Column_List">
+		id, parentid,`type`, content, path, ico, remark,created_time,updated_time,deleted
+	</sql>
+
+    <select id="selectByUserId" parameterType="INTEGER" resultType="com.yy.fasterp.pojo.Permission">
+		SELECT distinct p.*
+		from permission p,role_permission
+		rp,user_role ur
+		where p.id = rp.permissionid and rp.roleid = ur.roleid
+		and ur.userid = #{id} and p.deleted = 0
+	</select>
+    <select id="selectByTypeUserId" resultType="com.yy.fasterp.pojo.Permission">
+		SELECT distinct p.*
+		from permission p,role_permission
+		rp,user_role ur
+		where p.id = rp.permissionid and rp.roleid = ur.roleid
+		and ur.userid = #{userId} and p.type = #{type} and p.deleted = 0
+	</select>
+
+
+    <select id="selectById" parameterType="java.lang.Integer" resultType="com.yy.fasterp.pojo.Permission">
+        select
+        <include refid="Base_Column_List"/>
+        from permission
+        where id = #{id} and deleted = 0
+    </select>
+    <delete id="deleteById" parameterType="java.lang.Integer">
+		delete from
+		permission
+		where id = #{id} and deleted = 0
+	</delete>
+    <insert id="insert" parameterType="com.yy.fasterp.pojo.Permission">
+        insert into permission (<include refid="Base_Column_List"/>)
+        values (#{id},#{parentid},#{type},#{content},#{path},#{ico},#{remark},now(),now(),0)
+    </insert>
+    <update id="updateById" parameterType="com.yy.fasterp.pojo.Permission">
+        update permission
+        <set>
+            <if test="parentid != null and parentid != ''">
+                parentid = #{parentid},
+            </if>
+            <if test="type != null and type != ''">
+                type = #{type},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="path != null and path != ''">
+                path = #{path},
+            </if>
+            <if test="ico != null and ico != ''">
+                ico = #{ico},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted},
+            </if>
+            updated_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="queryAll" resultType="com.yy.fasterp.pojo.Permission">
+        select
+        <include refid="Base_Column_List"/>
+        from permission where deleted = 0
+    </select>
+
+    <select id="selectByContent" parameterType="java.lang.String" resultType="com.yy.fasterp.pojo.Permission">
+        select
+        <include refid="Base_Column_List"/>
+        from permission
+        where content= #{content} and deleted = 0
+    </select>
+</mapper>
