@@ -94,4 +94,7 @@ public interface UserMapper {
      * @return
      */
     List<Role> selectAllRoles(Integer id);
+
+
+    void updateBatch(List<User> users);
 }

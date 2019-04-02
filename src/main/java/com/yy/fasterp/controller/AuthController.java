@@ -9,6 +9,7 @@ import com.yy.fasterp.service.IPermissionService;
 import com.yy.fasterp.utils.Reply;
 import com.yy.fasterp.utils.ShiroUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -74,6 +75,8 @@ public class AuthController {
             return Reply.error("用户不存在");
         } catch (IncorrectCredentialsException ex) {
             return Reply.error("密码错误");
+        } catch (DisabledAccountException ex) {
+            return Reply.error("账户已停用");
         } catch (Exception ex) {
             ex.printStackTrace();
             return Reply.error("内部错误，请重试！");

@@ -3,6 +3,7 @@ package com.yy.fasterp.service;
 import java.util.List;
 
 import com.yy.fasterp.pojo.Permission;
+import com.yy.fasterp.utils.Reply;
 
 /**
  * @author Rio(417168602 @ qq.com)
@@ -23,7 +24,7 @@ public interface IPermissionService {
      * @param record
      * @return
      */
-    int insert(Permission record);
+    Reply insert(Permission record);
 
     /**
      * 查询

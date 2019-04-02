@@ -40,28 +40,15 @@
 <script>
     function login() {
         if ($('#userinput').val() == "") {
-            layer.tips("请填写用户名", '#userinput', {
-                tipsMore: false,
-                time: 1000
-            });
+            Message.tips("请填写用户名");
+            return;
+        }else if ($('#pwdinput').val() == "") {
+            Message.tips("请填写密码");
+            return;
+        }else if ($('#capinput').val() == "") {
+            Message.tips("请填写验证码");
             return;
         }
-        if ($('#pwdinput').val() == "") {
-            layer.tips("请填写密码", '#pwdinput', {
-                tipsMore: false,
-                time: 1000
-            });
-            return;
-        }
-        if ($('#capinput').val() == "") {
-            layer.tips("请填写验证码", '#capinput', {
-                tipsMore: false,
-                time: 1000
-            });
-            return;
-        }
-        // var pwd = $('#pwdinput').val();
-        // $('#pwdinput').val($.md5(pwd));
         var postData = {
             username: "",
             password: "",
@@ -80,25 +67,9 @@
                 if (data.code == 200) {
                     window.location.href = basePath + "/static/modules/index/index.html";
                 } else {
-                    var id = "";
-                    if (data.message == "用户不存在")
-                        id = '#userinput';
-                    else if (data.message == "密码错误")
-                        id = '#pwdinput';
-                    else if (data.message == "验证码错误")
-                        id = '#capinput';
-                    else {
-                        alert(data.message);
-                        $(".logincap").click();
-                        return;
-                    }
-                    layer.tips(data.message, id, {
-                        tipsMore: false,
-                        time: 1000
-                    });
+                    Message.error(data.message);
                     $(".logincap").click();
                 }
-
             },
         });
         return false;

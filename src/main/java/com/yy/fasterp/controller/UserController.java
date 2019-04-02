@@ -11,6 +11,7 @@ import com.yy.fasterp.vo.UserVO;
 import org.apache.ibatis.reflection.ArrayUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,10 +62,9 @@ public class UserController {
     }
 
     @RequiresPermissions("user:del")
-    @RequestMapping("/deletelist")
-    public Reply deleteUserList(@RequestBody List<User> users) {
-        userService.deleteUserList(users);
-        return Reply.ok("删除成功");
+    @RequestMapping("/deleteList")
+    public Reply deleteUserList(Integer[] ids) {
+        return userService.deleteUserList(ids);
     }
 
     @RequiresPermissions("user:add")
@@ -117,4 +117,30 @@ public class UserController {
         return userService.updateUser(updateUser);
     }
 
+
+    @RequestMapping("/changePwd")
+    public Reply changePwd(String original, @RequestParam("new") String newPwd, @RequestParam("renew") String reNewPwd) {
+        if (StringUtils.isEmpty(original)) {
+            return Reply.error("原始密码不能为空");
+        }
+        if (StringUtils.isEmpty(newPwd)) {
+            return Reply.error("新密码不能为空");
+        }
+        if (!newPwd.equals(reNewPwd)) {
+            return Reply.error("两次密码不一样");
+        }
+        User currentUser = ShiroUtils.getUser();
+        //使用前台传入密码计算真实密码
+        String pwd = CommonUtils.toHex(CommonUtils.digest(original, currentUser.getSalt().getBytes()));
+        //如果对不上则密码错误
+        if (!pwd.equals(currentUser.getPassword())) {
+            return Reply.error("原始密码不正确");
+        }
+        User user = new User();
+        user.setId(currentUser.getId());
+        user.setPassword(newPwd);
+        userService.updateUser(user);
+        ShiroUtils.getSubject().logout();
+        return Reply.ok();
+    }
 }

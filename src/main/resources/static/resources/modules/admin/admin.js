@@ -188,7 +188,7 @@ layui.define(['jquery', 'form', 'layer', 'element'], function(exports) {
 					id: id
 				});
 				//当前窗口内容
-				setStorageMenu(title, url, id);
+				//setStorageMenu(title, url, id);
 
 			}
 			CustomRightClick(id); //绑定右键菜单
@@ -197,7 +197,7 @@ layui.define(['jquery', 'form', 'layer', 'element'], function(exports) {
 		},
 		tabDelete: function(id) {
 			element.tabDelete("wenav_tab", id); //删除
-			removeStorageMenu(id);
+			//removeStorageMenu(id);
 
 		},
 		tabChange: function(id) {
@@ -370,16 +370,16 @@ layui.define(['jquery', 'form', 'layer', 'element'], function(exports) {
 	 */
 	element.on('tab(wenav_tab)', function(data) {
 		//console.log(this); //当前Tab标题所在的原始DOM元素
-		setStorageCurMenu();
+		//setStorageCurMenu();
 	});
 	/*
 	 * @todo 监听layui Tab项的关闭按钮，改变本地存储
 	 */
-	element.on('tabDelete(wenav_tab)', function(data) {
-		var layId = $(this).parent('li').attr('lay-id');
+	// element.on('tabDelete(wenav_tab)', function(data) {
+	// 	var layId = $(this).parent('li').attr('lay-id');
 		//console.log(layId);
-		removeStorageMenu(layId);
-	});
+		//removeStorageMenu(layId);
+	// });
 	/**
 	 *@todo 本地存储 localStorage
 	 * 为了保持统一，将sessionStorage更换为存储周期更长的localStorage

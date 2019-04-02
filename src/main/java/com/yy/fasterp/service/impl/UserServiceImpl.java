@@ -4,11 +4,8 @@ import com.yy.fasterp.mapper.UserMapper;
 import com.yy.fasterp.pojo.Role;
 import com.yy.fasterp.pojo.User;
 import com.yy.fasterp.service.IUserService;
-import com.yy.fasterp.utils.CollectionUtils;
-import com.yy.fasterp.utils.CommonUtils;
-import com.yy.fasterp.utils.ShiroUtils;
+import com.yy.fasterp.utils.*;
 import com.yy.fasterp.utils.pagehelper.PageInfo;
-import com.yy.fasterp.utils.Reply;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +48,7 @@ public class UserServiceImpl implements IUserService {
         }
         if (!StringUtils.isEmpty(user.getPassword())) {
             user.setSalt(CommonUtils.randomSalt());
-            String password = CommonUtils.toHex(CommonUtils.digest(CommonUtils.MD5(user.getPassword()), user.getSalt().getBytes()));
+            String password = CommonUtils.toHex(CommonUtils.digest(user.getPassword(), user.getSalt().getBytes()));
             user.setPassword(password);
         }
         //更新用户信息
@@ -83,13 +80,17 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void deleteUserList(List<User> userList) {
-        List<Integer> userIds = new ArrayList<>();
-        for (User user : userList) {
-            userIds.add(user.getId());
+    @Transactional(rollbackFor = Exception.class)
+    public Reply deleteUserList(Integer[] ids) {
+        if (!ArrayUtils.isEmpty(ids)) {
+            for (int i = 0; i < ids.length; i++) {
+                User user = new User();
+                user.setId(ids[i]);
+                user.setDeleted(true);
+                userMapper.update(user);
+            }
         }
-        userMapper.deleteUserRoles(userIds);
-        userMapper.deleteUserList(userList);
+        return Reply.ok();
     }
 
     @Override

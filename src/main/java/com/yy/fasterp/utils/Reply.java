@@ -20,7 +20,7 @@ public class Reply {
     }
 
     public static Reply ok() {
-        return ok("ok", null);
+        return ok("操作成功", null);
     }
 
     public static Reply ok(String message) {
@@ -28,7 +28,7 @@ public class Reply {
     }
 
     public static Reply ok(Object data) {
-        return ok("ok", data);
+        return ok("操作成功", data);
     }
 
     public static Reply error(String message) {

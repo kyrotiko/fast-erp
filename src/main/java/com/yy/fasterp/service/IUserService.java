@@ -18,5 +18,5 @@ public interface IUserService {
 	User findUserByUserName(String username);
 	List<User> getUserListByLimit(PageInfo page, String username);
 	Reply deleteUser(User user);
-	void deleteUserList(List<User> userList);
+	Reply deleteUserList(Integer[] ids);
 }

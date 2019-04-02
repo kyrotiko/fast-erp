@@ -6,6 +6,7 @@ import com.yy.fasterp.pojo.Permission;
 import com.yy.fasterp.service.IPermissionService;
 import com.yy.fasterp.utils.CollectionUtils;
 import com.yy.fasterp.utils.PermissionTreeBuilder;
+import com.yy.fasterp.utils.Reply;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +28,9 @@ public class PermissionServiceImpl implements IPermissionService {
     }
 
     @Override
-    public int insert(Permission record) {
-        return permissionMapper.insert(record);
+    public Reply insert(Permission record) {
+        permissionMapper.insert(record);
+        return Reply.ok();
     }
 
     @Override

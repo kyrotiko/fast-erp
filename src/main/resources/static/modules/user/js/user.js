@@ -76,72 +76,52 @@ layui.use('table', function () {
         var data = obj.data; // 获得当前行数据
         var layEvent = obj.event;
         var tr = obj.tr; // 获得当前行 tr 的DOM对象
-
-        if (layEvent === 'del') { // 删除
-            confirm('确认删除？', function (index) {
-                $.ajax({
-                    type: "post",
-                    url: basePath + "/rest/user/delete",
-                    data: "id=" + data.id,
-                    success: function (data) {
-                        alert(data.message);
-                        tableins.reload();
+        // 删除
+        if (layEvent === 'del') {
+            Message.confirm("确认删除?", function () {
+                Http.post(basePath + "/rest/user/update", {
+                    id: data.id,
+                    deleted: 1
+                }, function (data) {
+                    Message.success(data.message);
+                    tableins.reload();
+                })
+            });
+        }
+        //启用禁用
+        else if (layEvent == 'stop' || layEvent == 'unstop') {
+            Http.post(basePath + "/rest/user/update", {
+                id: data.id,
+                status: layEvent === 'stop' ? 0 : 1
+            }, function (data) {
+                Message.success(data.message);
+                vm.showListView();
+                tableins.reload();
+            })
+        }
+        // 编辑
+        else if (layEvent === 'edit') {
+            Http.post(basePath + "/rest/user/info", data, function (data) {
+                var user = data.data;
+                var roles = user.roles;
+                var roleNames = "";
+                var roleAdds = [];
+                for (var i = 0; i < roles.length; i++) {
+                    var tmpRole = roles[i];
+                    roleNames = roleNames + tmpRole.role;
+                    roleAdds.push(tmpRole.id);
+                    if (i < roles.length - 1) {
+                        roleNames = roleNames + ",";
                     }
-                });
-                layer.close(index);
-            });
-        } else if (layEvent == 'stop' || layEvent == 'unstop') {
-            $.ajax({
-                type: "post",
-                url: basePath + "/rest/user/update",
-                data: {id: data.id, status: layEvent === 'stop' ? 0 : 1},
-                success: function (data) {
-                    alert(data.message, function () {
-                        if (data.code == 200) {
-                            vm.showListView();
-                            tableins.reload();
-                        }
-                    });
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(JSON.parse(jqXHR.responseText).message);
                 }
-            });
-
-
-        } else if (layEvent === 'edit') { // 编辑
-            $.ajax({
-                type: "post",
-                url: basePath + "/rest/user/info",
-                data: data,
-                success: function (data) {
-                    var user = data.data;
-                    var roles = user.roles;
-                    var roleNames = "";
-                    var roleadds = [];
-                    for (var i = 0; i < roles.length; i++) {
-                        role = roles[i];
-                        roleNames = roleNames + role.role;
-                        roleadds.push(role.id);
-                        if (i < roles.length - 1) {
-                            roleNames = roleNames + ",";
-                        }
-                    }
-
-
-                    $('#role2').val(roleNames);
-                    vm.user.id = user.id;
-                    vm.user.username = user.username;
-                    vm.user.roleadd = roleadds;
-                    vm.user.nickname = user.nickname;
-                    vm.user.mobile = user.mobile;
-                    vm.user.email = user.email;
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(JSON.parse(jqXHR.responseText).message);
-                }
-            });
-
+                $('#role2').val(roleNames);
+                vm.user.id = user.id;
+                vm.user.username = user.username;
+                vm.user.roleadd = roleAdds;
+                vm.user.nickname = user.nickname;
+                vm.user.mobile = user.mobile;
+                vm.user.email = user.email;
+            })
             vm.showEditView();
         }
     });
@@ -193,104 +173,98 @@ var vm = new Vue({
                 alert("请选中至少一条记录");
                 return;
             }
-            confirm('确认删除所选用户？', function (index) {
-                $.ajax({
-                    type: "post",
-                    url: basePath + "/rest/user/deletelist",
-                    data: JSON.stringify(checkStatus.data),
-                    contentType: 'application/json',
-                    success: function (data) {
-                        alert(data.message);
-                        tableins.reload();
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert(JSON.parse(jqXHR.responseText).message);
+            Message.confirm("确认删除所选用户？", function () {
+                var ids = "";
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    ids += checkStatus.data[i].id;
+                    if (i < checkStatus.data.length - 1) {
+                        ids = ids + ",";
                     }
-                });
-                layer.close(index);
-            });
+                }
+                Http.post(basePath + "/rest/user/deleteList", {ids: ids}, function (data) {
+                    Message.success(data.message);
+                    tableins.reload();
+                })
+            })
+        },
+        addUser: function (tableData) {
+            Http.post(basePath + "/rest/user/add", tableData.field, function (data) {
+                Message.success(data.message);
+                vm.showListView();
+                tableins.reload();
 
-            console.log(checkStatus);
+            });
         },
         editUser: function () {
-            $.ajax({
-                type: "post",
-                url: basePath + "/rest/user/update",
-                data: vm.user,
-                success: function (data) {
-                    alert(data.message, function () {
-                        if (data.code == 200) {
-                            vm.showListView();
-                            tableins.reload();
-                        }
-                    });
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(JSON.parse(jqXHR.responseText).message);
-                }
+            var postData = {
+                id: vm.user.id,
+                roleadd: vm.user.roleadd,
+                username: vm.user.username,
+                nickname: vm.user.nickname,
+                password: $.md5(vm.user.password),//md5加密密码
+                repass: vm.user.repass,
+                mobile: vm.user.mobile,
+                email: vm.user.email
+            }
+            Http.post(basePath + "/rest/user/update", postData, function (data) {
+                Message.success(data.message);
+                vm.showListView();
+                tableins.reload();
             });
         },
         loadRole: function (role1, role2) {
-            //console.log(role1,role2)
-            $.ajax({
-                type: "post",
-                url: basePath + "/rest/role/all/list",
-                success: function (data) {
-                    alreadyRoles = $('#' + role1).val().split(",")
-                    var roles = data.data;
-                    var html = "";
-                    for (j = 0; j < roles.length; j++) {
-                        var role = roles[j];
-                        html = html + "<div class=\"layui-inline my-list-iteam\">\r\n";
-                        html = html + "<input type=\"checkbox\" role=\"" + role.role + "\" class=\"chklist\" value=\"" + role.id + "\" ";
-                        if (alreadyRoles.contains(role.role)) {
-                            html = html + "checked=\"checked\"";
-                        }
-                        html = html + "/>\r\n";
-                        html = html + "<label class=\"chkbox\"> \r\n"
-                        html = html + "<span class=\"check-image\"></span>  \r\n"
-                        html = html + "<span class=\"radiobox-content\">" + role.role + "</span>  \r\n"
-                        html = html + "</label></div> \r\n"
+            Http.post(basePath + "/rest/role/all/list", {}, function (data) {
+                alreadyRoles = $('#' + role1).val().split(",")
+                var roles = data.data;
+                var html = "";
+                for (j = 0; j < roles.length; j++) {
+                    var role = roles[j];
+                    html = html + "<div class=\"layui-inline my-list-iteam\">\r\n";
+                    html = html + "<input type=\"checkbox\" role=\"" + role.role + "\" class=\"chklist\" value=\"" + role.id + "\" ";
+                    if (alreadyRoles.contains(role.role)) {
+                        html = html + "checked=\"checked\"";
                     }
-                    $('#selectbody').html(html);
-                    $(".chklist").labelauty("chklist", "check");
-                    layer.open({
-                        type: 1,
-                        title: "选择角色",
-                        area: ['540px', '380px'],
-                        skin: 'layui-layer-rim', // 加上边框
-                        content: $('#select'),
-                        btn: ['确定', '取消'],
-                        yes: function (index, layero) {
-                            // console.log(vm.user.roleids);
-                            var roles = [];
-                            var roleids = [];
-                            $('#selectbody input:checked').each(function () {
-                                roles.push($(this).attr('role'));
-                                roleids.push($(this).val());
-                            });
-                            var roleVal = "";
-                            for (var i = 0; i < roles.length; i++) {
-                                roleVal = roleVal + roles[i];
-                                if (i < roles.length - 1) {
-                                    roleVal = roleVal + ",";
-                                }
-                            }
-                            $('#' + role1).val(roleVal);
-                            $('#' + role2).val(roleids);
-                            vm.user.roleadd = roleids;
-                            layer.close(index);
-                        },
-                        btn2: function (index, layero) {
-                            // alert("取消了");
-                        },
-                        btnAlign: 'c'
-                    });
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(JSON.parse(jqXHR.responseText).message);
+                    html = html + "/>\r\n";
+                    html = html + "<label class=\"chkbox\"> \r\n"
+                    html = html + "<span class=\"check-image\"></span>  \r\n"
+                    html = html + "<span class=\"radiobox-content\">" + role.role + "</span>  \r\n"
+                    html = html + "</label></div> \r\n"
                 }
-            });
+                $('#selectbody').html(html);
+                $(".chklist").labelauty("chklist", "check");
+                layer.open({
+                    type: 1,
+                    title: "选择角色",
+                    area: ['540px', '380px'],
+                    skin: 'layui-layer-rim', // 加上边框
+                    content: $('#select'),
+                    btn: ['确定', '取消'],
+                    yes: function (index, layero) {
+                        // console.log(vm.user.roleids);
+                        var roles = [];
+                        var roleids = [];
+                        $('#selectbody input:checked').each(function () {
+                            roles.push($(this).attr('role'));
+                            roleids.push($(this).val());
+                        });
+                        var roleVal = "";
+                        for (var i = 0; i < roles.length; i++) {
+                            roleVal = roleVal + roles[i];
+                            if (i < roles.length - 1) {
+                                roleVal = roleVal + ",";
+                            }
+                        }
+                        $('#' + role1).val(roleVal);
+                        $('#' + role2).val(roleids);
+                        vm.user.roleadd = roleids;
+                        layer.close(index);
+                    },
+                    btn2: function (index, layero) {
+                        // alert("取消了");
+                    },
+                    btnAlign: 'c'
+                });
+            })
         }
     }
 })
@@ -308,29 +282,13 @@ layui.use(['form'], function () {
     });
     // 监听提交
     form.on('submit(addUser)', function (data) {
-        $.ajax({
-            type: "post",
-            url: basePath + "/rest/user/add",
-            data: data.field,
-            success: function (data) {
-                alert(data.message, function () {
-                    if (data.code == 200) {
-                        vm.showListView();
-                        tableins.reload();
-                    }
-                });
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert(JSON.parse(jqXHR.responseText).message);
-            }
-        });
+        vm.addUser(data);
         return false;
     });
 
-    // 监听提交
+// 监听提交
     form.on('submit(editUser)', function (data) {
         vm.editUser();
         return false;
     });
-
 });

@@ -43,6 +43,9 @@
                         <el-radio-button label="FUNCTION">功能</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
+                <el-form-item label="排序">
+                    <el-input v-model="permission.order" placeholder="请输入排序值0~99999"></el-input>
+                </el-form-item>
                 <el-form-item label="路径">
                     <el-input v-model="permission.path" placeholder="请输入路径"></el-input>
                 </el-form-item>
@@ -50,55 +53,6 @@
                     <el-input v-model="permission.remark" placeholder="请输入备注"></el-input>
                 </el-form-item>
             </el-form>
-
-
-            <!--<div class="layui-form">
-                <input type="text" class="layui-hide" v-model="permission.id"/>
-                <input type="text" class="layui-hide" v-model="permission.parentid"/>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">权限名</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请输入权限名称" autocomplete="off"
-                               v-model="permission.content" lay-verify="required"
-                               class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">类型</label>
-                    <div class="layui-input-block">
-                        <input type="radio" v-model="permission.type" name="type" value="MENU" title="菜单"
-                               lay-verify="required"
-                               class="layui-input">
-                        <input type="radio" v-model="permission.type" name="type" value="FUNCTION" title="功能"
-                               lay-verify="required"
-                               class="layui-input">
-
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">路径</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请输入路径" autocomplete="off"
-                               v-model="permission.path" lay-verify="required"
-                               class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">备注</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请输入备注" autocomplete="off"
-                               v-model="permission.remark" class="layui-input">
-                    </div>
-                </div>-->
-            <!-- <div class="layui-form-item">
-                <div class="layui-input-block">
-                    <button class="layui-btn" lay-submit lay-filter="addRule">新增</button>
-                    <button class="layui-btn" lay-submit lay-filter="updateRule">修改</button>
-                    <button class="layui-btn layui-btn-warm" lay-submit
-                        lay-filter="deleteRule">删除</button>
-                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-                </div>
-            </div> -->
         </div>
     </div>
 </div>

@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>导航系统后台管理平台</title>
+    <script type="text/javascript" src="../../resources/js/header.js"></script>
+
+    <style>
+        .text {
+            font-size: 14px;
+        }
+
+        .item {
+            margin-bottom: 18px;
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+
+        .clearfix:after {
+            clear: both
+        }
+
+        .box-card {
+            width: 480px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="vcontroller">
+    <el-card class="box-card">
+        <div class="text item">
+            <el-form label-position="left" label-width="100px" :model="pwd" status-icon ref="pwd" :rules="rules">
+                <el-form-item label="原密码" prop="original">
+                    <el-input v-model="pwd.original" autocomplete="off" type="password"></el-input>
+                </el-form-item>
+                <el-form-item label="新密码" prop="new">
+                    <el-input v-model="pwd.new" autocomplete="off" type="password"></el-input>
+                </el-form-item>
+                <el-form-item label="重复新密码" prop="renew">
+                    <el-input v-model="pwd.renew" autocomplete="off" type="password"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="update">立即修改</el-button>
+                    <el-button @click="reset">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+    </el-card>
+</div>
+<script src="js/pwd.js"></script>
+</body>
+</html>
