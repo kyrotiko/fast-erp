@@ -13,7 +13,7 @@ import com.yy.fasterp.utils.Reply;
  */
 public interface IUserService {
 	void saveUser(User user);
-	void updateUser(User user);
+	Reply updateUser(User user);
 	User findUserById(int id);
 	User findUserByUserName(String username);
 	List<User> getUserListByLimit(PageInfo page, String username);

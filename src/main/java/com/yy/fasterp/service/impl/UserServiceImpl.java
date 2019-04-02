@@ -4,11 +4,15 @@ import com.yy.fasterp.mapper.UserMapper;
 import com.yy.fasterp.pojo.Role;
 import com.yy.fasterp.pojo.User;
 import com.yy.fasterp.service.IUserService;
+import com.yy.fasterp.utils.CollectionUtils;
+import com.yy.fasterp.utils.CommonUtils;
+import com.yy.fasterp.utils.ShiroUtils;
 import com.yy.fasterp.utils.pagehelper.PageInfo;
 import com.yy.fasterp.utils.Reply;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,34 +24,52 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements IUserService {
     @Autowired
-    private UserMapper userDAO;
+    private UserMapper userMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveUser(User user) {
         List<Role> roles = user.getRoles();
-        userDAO.save(user);
-        user = userDAO.findByUserName(user.getUsername());
-        userDAO.saveUserRole(roles, user);
+        userMapper.save(user);
+        user = userMapper.findByUserName(user.getUsername());
+        userMapper.saveUserRole(roles, user);
     }
 
     @Override
     public User findUserByUserName(String username) {
-        return userDAO.findByUserName(username);
+        return userMapper.findByUserName(username);
     }
 
     @Override
-    public void updateUser(User user) {
-        userDAO.update(user);
-        List<Integer> ids = new ArrayList<>();
-        ids.add(user.getId());
-        userDAO.deleteUserRoles(ids);
-        userDAO.saveUserRole(user.getRoles(), user);
+    @Transactional(rollbackFor = Exception.class)
+    public Reply updateUser(User user) {
+        if (!StringUtils.isEmpty(user.getUsername())) {
+            User backUser = findUserByUserName(user.getUsername());
+            if (backUser != null && !backUser.getId().equals(user.getId())) {
+                return Reply.error("用户名已存在");
+            }
+        }
+        if (!StringUtils.isEmpty(user.getPassword())) {
+            user.setSalt(CommonUtils.randomSalt());
+            String password = CommonUtils.toHex(CommonUtils.digest(CommonUtils.MD5(user.getPassword()), user.getSalt().getBytes()));
+            user.setPassword(password);
+        }
+        //更新用户信息
+        userMapper.update(user);
+        //更新用户权限
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            List<Integer> ids = new ArrayList<>();
+            ids.add(user.getId());
+            userMapper.deleteUserRoles(ids);
+            userMapper.saveUserRole(user.getRoles(), user);
+            ShiroUtils.refreshAuthorizationInfo();
+        }
+        return Reply.ok("修改成功");
     }
 
     @Override
     public List<User> getUserListByLimit(PageInfo page, String username) {
-        return userDAO.getUserListByLimit(page, username);
+        return userMapper.getUserListByLimit(page, username);
     }
 
     @Override
@@ -56,7 +78,7 @@ public class UserServiceImpl implements IUserService {
             return Reply.error("用户ID不能为空");
         }
         user.setDeleted(true);
-        userDAO.update(user);
+        userMapper.update(user);
         return Reply.ok();
     }
 
@@ -66,13 +88,13 @@ public class UserServiceImpl implements IUserService {
         for (User user : userList) {
             userIds.add(user.getId());
         }
-        userDAO.deleteUserRoles(userIds);
-        userDAO.deleteUserList(userList);
+        userMapper.deleteUserRoles(userIds);
+        userMapper.deleteUserList(userList);
     }
 
     @Override
     public User findUserById(int id) {
-        return userDAO.findById(id);
+        return userMapper.findById(id);
     }
 
 }

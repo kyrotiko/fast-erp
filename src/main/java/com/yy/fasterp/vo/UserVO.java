@@ -22,7 +22,7 @@ public class UserVO {
     private List<Role> roles;
     private List<Permission> permissions;
 
-    @StringMappingFormat(mapping = "0:启用,1:禁用")
+    @StringMappingFormat(mapping = "0:禁用,1:启用")
     private String status;
 
 }

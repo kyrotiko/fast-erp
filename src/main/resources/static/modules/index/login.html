@@ -60,12 +60,21 @@
             });
             return;
         }
-        var pwd = $('#pwdinput').val();
-        $('#pwdinput').val($.md5(pwd));
+        // var pwd = $('#pwdinput').val();
+        // $('#pwdinput').val($.md5(pwd));
+        var postData = {
+            username: "",
+            password: "",
+            captcha: ""
+        }
+        postData['username'] = $('#userinput').val();
+        postData['password'] = $.md5($('#pwdinput').val());
+        postData['captcha'] = $('#capinput').val();
+
         $.ajax({
             type: "POST",
             url: basePath + "/rest/auth/login",
-            data: $('#loginForm').serialize(),
+            data: postData,
             success: function (data) {
                 console.log(data);
                 if (data.code == 200) {

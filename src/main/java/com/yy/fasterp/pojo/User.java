@@ -1,13 +1,10 @@
 package com.yy.fasterp.pojo;
 
-import java.io.Serializable;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.annotation.JSONField;
+import lombok.*;
 
-import lombok.Data;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author Rio(417168602 @ qq.com)
@@ -15,6 +12,7 @@ import lombok.Data;
  */
 @Data
 public class User extends BasePojo {
+
     private Integer id;
     private String username;
     @JSONField(serialize = false)
@@ -26,6 +24,6 @@ public class User extends BasePojo {
     private String salt;
     private List<Role> roles;
     private List<Permission> permissions;
-
     private Integer status;
+
 }

@@ -2,6 +2,7 @@ package com.yy.fasterp.shiro;
 
 import java.util.List;
 
+import com.yy.fasterp.constant.StatusConstant;
 import com.yy.fasterp.pojo.Permission;
 import com.yy.fasterp.service.IRoleService;
 import org.apache.shiro.SecurityUtils;
@@ -55,6 +56,9 @@ public class ShiroRealm extends AuthorizingRealm {
         String userName = (String) token.getPrincipal();
         User user = userService.findUserByUserName(userName);
         if (user == null) {
+            return null;
+        }
+        if (user.getStatus().equals(StatusConstant.DISABLE)) {
             return null;
         }
         String realmName = this.getName();

@@ -7,6 +7,16 @@
 </head>
 
 <body>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    {{#  if(d.status == '启用'){ }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="stop">停用</a>
+    {{#  } else { }}
+    <a class="layui-btn layui-btn-xs" lay-event="unstop">启用</a>
+    {{#  } }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
 <div id="vcontroller">
     <!-- 查看用户 -->
     <div class="weadmin-body" v-show="showList">
@@ -30,11 +40,10 @@
                 </div>
                 <table id="laytable" lay-filter="maintable">
                 </table>
-                <div id="barDemo" style="display: none">
-                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="">禁用</a>
-                </div>
+
+                <!-- <div id="barDemo" style="display: none">-->
+                <!--</div>-->
+
             </div>
         </fieldset>
     </div>

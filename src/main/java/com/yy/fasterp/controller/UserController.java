@@ -8,6 +8,7 @@ import com.yy.fasterp.service.IUserService;
 import com.yy.fasterp.utils.*;
 import com.yy.fasterp.utils.pagehelper.PageInfo;
 import com.yy.fasterp.vo.UserVO;
+import org.apache.ibatis.reflection.ArrayUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,13 +69,13 @@ public class UserController {
 
     @RequiresPermissions("user:add")
     @RequestMapping("/add")
-    public Reply addUser(User frontUser, @RequestParam(value = "roleadd[0]") Integer[] roleadd) {
+    public Reply addUser(User frontUser, @RequestParam(value = "roleadd[0]") Integer[] roleAdd) {
         User user = userService.findUserByUserName(frontUser.getUsername());
         if (user != null) {
             return Reply.error("用户名已存在");
         }
         List<Role> roleList = new ArrayList<>();
-        for (Integer roleId : roleadd) {
+        for (Integer roleId : roleAdd) {
             Role role = new Role();
             role.setId(roleId);
             roleList.add(role);
@@ -90,32 +91,30 @@ public class UserController {
 
     @RequiresPermissions("user:update")
     @RequestMapping("/update")
-    public Reply updateUserInfo(User user, @RequestParam(value = "roleadd[]") Integer[] roleadd) {
-        User backUser = userService.findUserByUserName(user.getUsername());
-        if (backUser != null && backUser.getId() != user.getId()) {
-            return Reply.error("用户名已存在");
+    public Reply updateUserInfo(User user, @RequestParam(value = "roleadd[]", required = false) Integer[] roleAdd) {
+        if (user.getId() == null) {
+            return Reply.error("Id不能为空");
         }
-
-        List<Role> roleList = new ArrayList<>();
-        for (Integer roleId : roleadd) {
-            Role role = new Role();
-            role.setId(roleId);
-            roleList.add(role);
-        }
-        user.setRoles(roleList);
-
-        if (user.getPassword() != null) {
-            if (user.getPassword().isEmpty()) {
-                user.setPassword(null);
-            } else {
-                user.setSalt(CommonUtils.randomSalt());
-                String password = CommonUtils.toHex(CommonUtils.digest(CommonUtils.MD5(user.getPassword()), user.getSalt().getBytes()));
-                user.setPassword(password);
+        if (roleAdd != null) {
+            List<Role> roleList = new ArrayList<>();
+            for (Integer roleId : roleAdd) {
+                Role role = new Role();
+                role.setId(roleId);
+                roleList.add(role);
             }
+            user.setRoles(roleList);
         }
-        userService.updateUser(user);
-        ShiroUtils.refreshAuthorizationInfo();
-        return Reply.ok("修改成功");
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setUsername(user.getUsername());
+        updateUser.setNickname(user.getNickname());
+        updateUser.setMobile(user.getMobile());
+        updateUser.setEmail(user.getEmail());
+        updateUser.setStatus(user.getStatus());
+        updateUser.setPassword(user.getPassword());
+        updateUser.setDeleted(user.getDeleted());
+        updateUser.setRoles(user.getRoles());
+        return userService.updateUser(updateUser);
     }
 
 }

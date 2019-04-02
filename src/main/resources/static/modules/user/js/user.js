@@ -90,8 +90,26 @@ layui.use('table', function () {
                 });
                 layer.close(index);
             });
-        } else if (layEvent === 'edit') { // 编辑
+        } else if (layEvent == 'stop' || layEvent == 'unstop') {
+            $.ajax({
+                type: "post",
+                url: basePath + "/rest/user/update",
+                data: {id: data.id, status: layEvent === 'stop' ? 0 : 1},
+                success: function (data) {
+                    alert(data.message, function () {
+                        if (data.code == 200) {
+                            vm.showListView();
+                            tableins.reload();
+                        }
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(JSON.parse(jqXHR.responseText).message);
+                }
+            });
 
+
+        } else if (layEvent === 'edit') { // 编辑
             $.ajax({
                 type: "post",
                 url: basePath + "/rest/user/info",
