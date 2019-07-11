@@ -1,5 +1,6 @@
 package com.yy.fasterp.config;
 
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.yy.fasterp.utils.pagehelper.PagePlugin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,14 @@ import java.util.Properties;
 @Configuration
 public class MybatisConfiguration {
 
+
+    /**
+     * 分页插件
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+    }
 
     /**
      * 配置分页

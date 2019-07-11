@@ -70,7 +70,7 @@ public class AuthController {
             String ip = request.getRemoteAddr();
             loginLog.setPlatform(LoginLogPlatformConstant.PC);
             loginLog.setIp(ip);
-            loginLogService.insertByLoginLog(loginLog);
+            loginLogService.save(loginLog);
         } catch (UnknownAccountException ex) {
             return Reply.error("用户不存在");
         } catch (IncorrectCredentialsException ex) {

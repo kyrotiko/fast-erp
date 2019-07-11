@@ -11,59 +11,57 @@ import com.yy.fasterp.pojo.Permission;
  */
 public class PermissionTreeBuilder {
 
-	public static List<Permission> bulid(List<Permission> permissions) {
+    public static List<Permission> build(List<Permission> permissions) {
+        List<Permission> trees = new ArrayList<>();
+        for (Permission permission : permissions) {
+            if (permission.getParentid() == null) {
+                trees.add(permission);
+            }
+            for (Permission it : permissions) {
+                if (it.getParentid().equals(permission.getId())) {
+                    if (permission.getChildren() == null) {
+                        permission.setChildren(new ArrayList<>());
+                    }
+                    permission.getChildren().add(it);
+                }
+            }
+        }
+        return trees;
+    }
 
-		List<Permission> trees = new ArrayList<Permission>();
+    /**
+     * 使用递归方法建树
+     *
+     * @param permissions
+     * @return
+     */
+    public static List<Permission> buildByRecursive(List<Permission> permissions) {
+        List<Permission> trees = new ArrayList<>();
+        for (Permission permission : permissions) {
+            if (permission.getParentid() == null) {
+                trees.add(findChildren(permission, permissions));
+            }
+        }
+        return trees;
+    }
 
-		for (Permission permission : permissions) {
-
-			if (permission.getParentid() == null) {
-				trees.add(permission);
-			}
-
-			for (Permission it : permissions) {
-				if (it.getParentid() == permission.getId()) {
-					if (permission.getChildren() == null) {
-						permission.setChildren(new ArrayList<Permission>());
-					}
-					permission.getChildren().add(it);
-				}
-			}
-		}
-		return trees;
-	}
-
-	/**
-	 * 使用递归方法建树
-	 * @param permissions
-	 * @return
-	 */
-	public static List<Permission> buildByRecursive(List<Permission> permissions) {
-		List<Permission> trees = new ArrayList<Permission>();
-		for (Permission permission : permissions) {
-			if (permission.getParentid() == null) {
-				trees.add(findChildren(permission, permissions));
-			}
-		}
-		return trees;
-	}
-
-	/**
-	 * 递归查找子节点
-	 * @param permission
-	 * @param permissions
-	 * @return
-	 */
-	public static Permission findChildren(Permission permission, List<Permission> permissions) {
-		for (Permission it : permissions) {
-			if (permission.getId().equals(it.getParentid())) {
-				if (permission.getChildren() == null) {
-					permission.setChildren(new ArrayList<Permission>());
-				}
-				permission.getChildren().add(findChildren(it, permissions));
-			}
-		}
-		return permission;
-	}
+    /**
+     * 递归查找子节点
+     *
+     * @param permission
+     * @param permissions
+     * @return
+     */
+    public static Permission findChildren(Permission permission, List<Permission> permissions) {
+        for (Permission it : permissions) {
+            if (permission.getId().equals(it.getParentid())) {
+                if (permission.getChildren() == null) {
+                    permission.setChildren(new ArrayList<>());
+                }
+                permission.getChildren().add(findChildren(it, permissions));
+            }
+        }
+        return permission;
+    }
 
 }
